@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#f9f3f7">
+<title>让创意成为好玩的产品 · 小游戏产品与合作探索</title>
+<meta name="description" content="关于轻量小游戏、AI 辅助开发、产品实验与运营合作的一份交流提案。">
+<style>
+:root {
+  --text:#514842; --muted:#7f746d; --quiet:#a1948d;
+  --ink-2:#71625a; --card:rgba(255,255,255,.74);
+  --line:rgba(81,72,66,.13); --white-line:rgba(255,255,255,.8);
+  --shadow:0 18px 50px rgba(86,67,61,.09);
+  --soft-shadow:0 12px 30px rgba(86,67,61,.07);
+  --accent:#cc8fa1; --accent-deep:#a9667a; --accent-light:#f4dce2;
+  --bg-top:#f9f3f7; --bg-mid:#f4faf1; --bg-bottom:#ebf5e5;
+  --green:#96b49b; --shell:1160px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:90px}
+body{margin:0;min-width:320px;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:var(--bg-bottom);font-size:16px;line-height:1.75;transition:background-color .5s ease}
+body[data-season="summer"]{--accent:#729f7d;--accent-deep:#496f53;--accent-light:#d7eaca;--bg-top:#ebf7e8;--bg-mid:#d7edcb;--bg-bottom:#b6d4a5}
+body[data-season="autumn"]{--accent:#b97c63;--accent-deep:#875643;--accent-light:#eddbc0;--bg-top:#f8f1e8;--bg-mid:#ead9ba;--bg-bottom:#ddbea5}
+body[data-season="winter"]{--accent:#7e9ebe;--accent-deep:#56789c;--accent-light:#dbe6f4;--bg-top:#eff5fc;--bg-mid:#e0eaf8;--bg-bottom:#c6d9ed}
+button,a{font:inherit;-webkit-tap-highlight-color:transparent}
+button{cursor:pointer}
+a{color:inherit}
+button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--accent-deep);outline-offset:4px}
+::selection{background:var(--accent-light);color:var(--text)}
+#progress{position:fixed;z-index:100;left:0;top:0;width:0%;height:3px;background:var(--accent);border-radius:0 6px 6px 0;transition:width .1s linear}
+.page-bg{position:fixed;inset:0;z-index:-2;pointer-events:none;background:radial-gradient(circle at 18% 12%,rgba(255,255,255,.95) 0, transparent 22%),radial-gradient(circle at 84% 28%,rgba(255,255,255,.68), transparent 22%),linear-gradient(170deg,var(--bg-top) 0%,var(--bg-mid) 54%,var(--bg-bottom) 100%);transition:background .5s ease}
+.noise{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.24;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.12'/%3E%3C/svg%3E")}
+.container{width:min(var(--shell),calc(100% - 52px));margin:0 auto}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(250,249,246,.65);border-bottom:1px solid rgba(255,255,255,.62);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.topbar-inner{width:min(1270px,calc(100% - 48px));margin:0 auto;min-height:73px;display:flex;gap:18px;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;flex-shrink:0}
+.brand-mark{width:35px;height:35px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(145deg,#f9dce5,#d5e9ce);border:1px solid rgba(255,255,255,.9);box-shadow:0 5px 12px rgba(128,107,99,.1);font-size:18px}
+.brand-text{font-size:13px;font-weight:650;letter-spacing:.09em;line-height:1.45}
+.brand-text small{display:block;font-size:10px;font-weight:500;letter-spacing:.17em;color:var(--quiet)}
+.nav{display:flex;align-items:center;gap:21px}
+.nav a{text-decoration:none;font-size:12px;color:var(--muted);white-space:nowrap;transition:color .15s}
+.nav a:hover{color:var(--accent-deep)}
+.seasons{display:flex;gap:8px;padding:6px 9px;border:1px solid rgba(255,255,255,.8);border-radius:999px;background:rgba(255,255,255,.43);align-items:center;flex-shrink:0}
+.seasons-label{font-size:10px;color:var(--quiet);margin-right:3px;letter-spacing:.06em}
+.season-dot{padding:0;width:17px;height:17px;border-radius:50%;border:2px solid rgba(255,255,255,.95);box-shadow:0 1px 4px rgba(45,33,26,.09);transition:transform .2s,box-shadow .2s}
+.season-dot[aria-pressed="true"]{transform:scale(1.24);box-shadow:0 0 0 2px var(--accent-deep),0 3px 8px rgba(45,33,26,.09)}
+.season-dot[data-value="spring"]{background:#e9aebd}.season-dot[data-value="summer"]{background:#8dbd80}.season-dot[data-value="autumn"]{background:#d4a169}.season-dot[data-value="winter"]{background:#abc6e9}
+.hero{padding:94px 0 81px;min-height:660px;display:grid;grid-template-columns:1.1fr .9fr;align-items:center;gap:55px;position:relative}
+.eyebrow{font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--accent-deep);font-weight:700}
+.hero h1{font-size:clamp(44px,5.4vw,78px);font-weight:650;letter-spacing:-.045em;line-height:1.21;margin:21px 0 26px}
+.hero h1 em{font-style:normal;color:var(--accent-deep);position:relative;white-space:nowrap}
+.hero h1 em::after{content:"";position:absolute;height:7px;border-radius:90%;background:var(--accent-light);bottom:-5px;left:6%;right:5%;z-index:-1}
+.hero-desc{font-size:17px;line-height:2.05;color:var(--ink-2);max-width:490px;margin:0 0 30px}
+.cta-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;border:0;border-radius:100px;padding:13px 21px;font-size:13px;font-weight:650;transition:transform .2s,box-shadow .2s,background .2s;white-space:nowrap}
+.btn:hover{transform:translateY(-2px)}
+.btn.primary{background:var(--accent);color:white;box-shadow:0 11px 24px color-mix(in srgb,var(--accent) 24%,transparent)}
+.btn.secondary{background:rgba(255,255,255,.77);box-shadow:var(--soft-shadow);border:1px solid var(--white-line);color:var(--text)}
+.hero-meta{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:29px;font-size:11px;color:var(--muted)}
+.hero-meta span{border:1px solid rgba(255,255,255,.72);padding:7px 11px;border-radius:999px;background:rgba(255,255,255,.35)}
+.hero-art{position:relative;width:100%;max-width:480px;margin:0 auto;aspect-ratio:1 / 1.04;isolation:isolate}
+.art-wash{position:absolute;inset:6% -4%;border-radius:50%;filter:blur(2px);background:radial-gradient(circle at 35% 42%,rgba(255,255,255,.8),transparent 40%),radial-gradient(circle at 80% 36%,rgba(224,193,205,.44),transparent 35%),radial-gradient(circle at 48% 78%,rgba(155,192,149,.32),transparent 42%)}
+.orbit{position:absolute;border:1px dashed rgba(130,114,106,.16);border-radius:50%;inset:10%;transform:rotate(-21deg)}
+.orbit.two{inset:22%;transform:rotate(28deg)}
+.float-card{position:absolute;width:47%;height:40%;display:flex;flex-direction:column;justify-content:space-between;border:1px solid rgba(255,255,255,.82);background:rgba(255,255,255,.6);border-radius:27px;padding:22px 21px 19px;box-shadow:0 20px 40px rgba(99,79,79,.09);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:transform .35s,background .35s}
+.float-card:nth-of-type(3){left:5%;top:7%;transform:rotate(-9deg)}
+.float-card:nth-of-type(4){right:1%;top:3%;transform:rotate(8deg);background:rgba(243,222,230,.65)}
+.float-card:nth-of-type(5){left:2%;bottom:4%;transform:rotate(6deg);background:rgba(230,240,215,.7)}
+.float-card:nth-of-type(6){right:4%;bottom:3%;transform:rotate(-7deg)}
+.float-card:hover:nth-of-type(n){transform:rotate(0deg) translateY(-9px);z-index:5;background:rgba(255,255,255,.9)}
+.float-card .number{font-size:11px;letter-spacing:.2em;color:#928580;font-weight:650}
+.float-card .symbol{font-size:42px;line-height:1.3;color:var(--accent-deep)}
+.float-card .label{font-size:18px;font-weight:600;letter-spacing:.02em}
+.art-caption{position:absolute;z-index:6;bottom:-10px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:10px;letter-spacing:.15em;color:var(--quiet)}
+.section{padding:74px 0 75px;scroll-margin-top:80px}
+.section-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:25px;margin-bottom:28px}
+.section-kicker{font-size:11px;color:var(--accent-deep);font-weight:750;letter-spacing:.19em;text-transform:uppercase;display:block;margin-bottom:12px}
+.section-heading h2{font-size:clamp(30px,3.2vw,43px);font-weight:620;line-height:1.35;letter-spacing:-.045em;margin:0}
+.section-heading p{margin:0;color:var(--muted);font-size:13px;max-width:300px;line-height:1.9}
+.paper{background:var(--card);border:1px solid var(--white-line);border-radius:30px;box-shadow:var(--shadow);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.thesis{padding:39px 45px;position:relative;overflow:hidden;background:linear-gradient(128deg,rgba(255,255,255,.84),rgba(255,255,255,.52));display:grid;grid-template-columns:1.2fr .8fr;gap:26px;align-items:center}
+.thesis::before{content:"✳";position:absolute;right:27%;top:-93px;font-size:260px;color:var(--accent-light);opacity:.46;pointer-events:none;line-height:1}
+.thesis blockquote{padding:0;margin:13px 0 17px;font-weight:650;font-size:clamp(25px,3vw,37px);letter-spacing:-.04em;line-height:1.52}
+.thesis blockquote strong{color:var(--accent-deep);font-weight:700}
+.thesis p{color:var(--muted);font-size:14px;line-height:1.9;margin:0}
+.thesis-steps{display:grid;gap:10px}
+.thesis-step{display:flex;align-items:center;gap:12px;padding:13px 17px;border-radius:17px;background:rgba(255,255,255,.73);border:1px solid rgba(255,255,255,.85)}
+.thesis-step .tag{width:30px;height:30px;border-radius:11px;background:var(--accent-light);color:var(--accent-deep);display:grid;place-items:center;font-size:12px;font-weight:700;flex:none}
+.thesis-step b{font-size:13px;font-weight:650}.thesis-step small{display:block;color:var(--quiet);font-size:11px}
+.micro-notes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin-top:16px}
+.micro-note{padding:23px 23px 22px}.micro-note .icon{font-size:25px;margin-bottom:5px}.micro-note h3{margin:0 0 7px;font-size:17px}.micro-note p{margin:0;color:var(--muted);font-size:12px;line-height:1.85}
+.portfolio-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.portfolio-card{overflow:hidden;display:flex;flex-direction:column;min-width:0;background:rgba(255,255,255,.74);border:1px solid rgba(255,255,255,.85);border-radius:29px;box-shadow:var(--soft-shadow);transition:transform .2s,box-shadow .2s}
+.portfolio-card:hover{transform:translateY(-4px);box-shadow:0 22px 43px rgba(95,75,65,.11)}
+.project-visual{height:228px;position:relative;overflow:hidden;display:grid;place-items:center}
+.visual-gomoku{background:radial-gradient(circle at 14% 18%,rgba(255,255,255,.72),transparent 32%),linear-gradient(145deg,#e0e9db,#f5eadf)}
+.visual-deal{background:radial-gradient(circle at 83% 20%,rgba(255,255,255,.6),transparent 32%),linear-gradient(135deg,#f6dfd5,#e7c6cc)}
+.visual-home{background:radial-gradient(circle at 15% 21%,rgba(255,255,255,.8),transparent 35%),linear-gradient(145deg,#d7e5dc,#eee1c9)}
+.gomoku-board{position:relative;width:159px;height:159px;padding:13px;background:rgba(255,252,239,.84);border-radius:17px;border:1px solid rgba(255,255,255,.9);box-shadow:0 14px 26px rgba(97,78,65,.14);transform:rotate(-7deg);display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(5,1fr);gap:0}
+.cell{display:grid;place-items:center;position:relative;border-right:1px solid rgba(128,109,89,.18);border-bottom:1px solid rgba(128,109,89,.18)}
+.cell:nth-child(5n){border-right:0}.cell:nth-last-child(-n+5){border-bottom:0}
+.piece{width:19px;height:19px;border-radius:50%;display:block;background:#5c6262;box-shadow:inset -2px -3px 3px rgba(0,0,0,.17),0 2px 3px rgba(60,45,35,.14)}
+.piece.white{background:#fffef9;border:1px solid rgba(88,69,52,.25);box-shadow:inset -1px -2px 3px rgba(79,72,66,.14)}
+.skill-chip{position:absolute;right:31px;bottom:26px;background:rgba(255,255,255,.92);border-radius:12px;padding:8px 10px;font-size:12px;box-shadow:0 7px 20px rgba(74,66,50,.1)}
+.briefcases{display:grid;grid-template-columns:repeat(3,52px);gap:14px;transform:rotate(-5deg)}
+.case{width:52px;height:39px;border-radius:8px;background:linear-gradient(160deg,#fdfbf7,#f1e4dc);border:1px solid rgba(147,100,89,.22);box-shadow:0 8px 11px rgba(92,55,53,.12);position:relative;display:grid;place-items:center;color:#ac7785;font-size:15px;font-weight:750}
+.case::before{content:"";width:19px;height:7px;border:3px solid #e9d7d0;border-bottom:0;position:absolute;left:50%;top:-8px;transform:translateX(-50%);border-radius:6px 6px 0 0}
+.case.special{background:linear-gradient(140deg,#dba6b3,#c88497);color:#fff;border-color:rgba(255,255,255,.56);transform:translateY(-5px)}
+.house-illustration{width:204px;height:150px;position:relative;margin-top:30px}
+.house-roof{width:0;height:0;border-left:99px solid transparent;border-right:99px solid transparent;border-bottom:78px solid #c9928b;position:absolute;top:-26px;left:3px;filter:drop-shadow(0 5px 4px rgba(95,72,53,.08))}
+.house-base{position:absolute;left:19px;right:19px;bottom:0;height:114px;background:#fff8ec;border-radius:5px 5px 10px 10px;box-shadow:0 13px 20px rgba(93,78,59,.13)}
+.window{position:absolute;width:43px;height:46px;top:22px;border-radius:20px 20px 5px 5px;background:#f0cd99;border:5px solid #e1b7a5}
+.window.left{left:25px}.window.right{right:25px}
+.door{position:absolute;left:65px;bottom:0;width:38px;height:65px;border-radius:21px 21px 0 0;background:#a2baaa}
+.cat{position:absolute;width:35px;height:32px;left:66px;bottom:0;border-radius:47% 47% 34% 34%;background:#4f494b}
+.cat::before,.cat::after{content:"";position:absolute;width:14px;height:18px;background:#4f494b;top:-8px;clip-path:polygon(0 0,100% 30%,30% 100%)}
+.cat::before{left:0;transform:rotate(-12deg)}.cat::after{right:0;transform:scaleX(-1) rotate(-12deg)}
+.star{position:absolute;color:rgba(215,163,116,.65);font-size:26px;right:10px;top:-24px}
+.project-body{padding:24px 23px 24px;display:flex;flex-direction:column;flex:1}
+.project-index{color:var(--accent-deep);font-size:10px;letter-spacing:.2em;font-weight:800}
+.project-body h3{font-size:22px;font-weight:650;line-height:1.4;margin:10px 0 3px}
+.project-type{font-size:11px;color:var(--quiet);letter-spacing:.06em;margin:0 0 14px}
+.project-body>p{font-size:13px;color:var(--muted);line-height:1.95;margin:0 0 16px}
+.chip-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:auto}
+.chip{padding:5px 10px;font-size:10px;border:1px solid rgba(137,111,97,.1);background:rgba(255,255,255,.65);color:var(--ink-2);border-radius:999px}
+.project-link{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:19px;padding:12px 13px 12px 17px;border:1px solid color-mix(in srgb,var(--accent) 22%,white);border-radius:15px;background:linear-gradient(110deg,color-mix(in srgb,var(--accent-light) 60%,white),rgba(255,255,255,.86));color:var(--accent-deep);font-size:12px;font-weight:750;text-decoration:none;letter-spacing:.025em;transition:transform .2s,box-shadow .2s,background .2s,border-color .2s}
+.project-link:hover{transform:translateY(-2px);box-shadow:0 9px 20px color-mix(in srgb,var(--accent) 15%,transparent);border-color:var(--accent)}
+.project-link:active{transform:translateY(0)}
+.project-link-label{display:flex;align-items:center;gap:9px}
+.project-link-label::before{content:"▶";display:grid;place-items:center;width:22px;height:22px;flex:none;border-radius:50%;background:var(--accent);color:white;font-size:9px;padding-left:2px}
+.project-link-arrow{font-size:20px;line-height:1;font-weight:400;transition:transform .2s}
+.project-link:hover .project-link-arrow{transform:translate(2px,-2px)}
+.project-body details{border-top:1px solid var(--line);margin-top:18px;padding-top:14px}
+.project-body summary{font-size:12px;color:var(--accent-deep);font-weight:650;list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.project-body summary::-webkit-details-marker{display:none}
+.project-body summary::after{content:"＋";font-size:19px;font-weight:350;transition:transform .2s}
+.project-body details[open] summary::after{transform:rotate(45deg)}
+.project-body details p{font-size:12px;color:var(--muted);line-height:1.9;margin:12px 0 0}
+.capabilities{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:19px}
+.capability{padding:25px 28px}.capability .overline{font-size:10px;color:var(--accent-deep);font-weight:800;letter-spacing:.16em}.capability h3{margin:9px 0;font-size:19px}.capability p{font-size:13px;color:var(--muted);margin:0;line-height:1.95}
+.insight-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.insight-main{padding:35px 36px;display:flex;flex-direction:column;justify-content:space-between;min-height:370px;background:linear-gradient(135deg,rgba(255,255,255,.83),rgba(246,226,232,.6))}
+.insight-main .big-mark{font-size:58px;line-height:1;margin:10px 0 20px;color:var(--accent-deep)}
+.insight-main h3{font-size:27px;line-height:1.45;margin:0 0 11px;letter-spacing:-.02em}
+.insight-main p{margin:0;font-size:13px;color:var(--muted);line-height:1.95}
+.insight-side{display:grid;gap:15px}
+.insight-small{padding:23px 26px;display:flex;align-items:flex-start;gap:18px}
+.insight-small .serial{width:44px;height:44px;display:grid;place-items:center;background:var(--accent-light);color:var(--accent-deep);border-radius:15px;font-size:12px;font-weight:700;flex:none}
+.insight-small h4{font-size:16px;margin:0 0 5px}.insight-small p{font-size:12px;line-height:1.9;color:var(--muted);margin:0}
+.model-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.model{padding:25px 25px 24px}.model-head{display:flex;justify-content:space-between;align-items:center}.model-code{font-weight:700;color:var(--accent-deep);font-size:28px;letter-spacing:.01em}.model .model-icon{font-size:25px}
+.model h3{font-size:17px;margin:11px 0 8px}.model p{font-size:13px;color:var(--muted);margin:0;line-height:1.9}
+.disclaimer{margin:17px 0 0;color:var(--muted);font-size:12px;line-height:1.9}
+.coop{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:stretch}
+.role{padding:33px 33px 29px;position:relative;overflow:hidden}
+.role::after{content:"";height:125px;width:125px;border-radius:50%;position:absolute;right:-50px;top:-65px;background:var(--accent-light);opacity:.5}
+.role-label{color:var(--accent-deep);letter-spacing:.17em;font-size:11px;font-weight:800}
+.role h3{font-size:24px;margin:9px 0 7px}.role .sub{margin:0 0 23px;color:var(--muted);font-size:12px}
+.role ul{margin:0;padding:0;list-style:none;display:grid;gap:12px}
+.role li{font-size:13px;padding:10px 13px 10px 37px;position:relative;background:rgba(255,255,255,.54);border-radius:13px}
+.role li::before{content:"✓";position:absolute;left:15px;color:var(--accent-deep);font-weight:750}
+.coop-middle{display:flex;justify-content:center;align-items:center;gap:12px;text-align:center;padding:22px 0;font-size:13px;color:var(--ink-2)}
+.coop-middle .line{width:min(120px,13%);height:1px;background:var(--accent);opacity:.6}
+.roadmap{padding:35px}
+.roadmap-nav{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin:0 0 23px}
+.stage-btn{border:1px solid rgba(255,255,255,.95);background:rgba(255,255,255,.56);border-radius:16px;padding:14px 9px;min-width:0;color:var(--muted);font-size:12px;font-weight:600;transition:background .2s,transform .2s}
+.stage-btn span{display:block;font-size:10px;opacity:.68;letter-spacing:.1em;margin-bottom:3px}
+.stage-btn[aria-selected="true"]{background:var(--accent);color:#fff;box-shadow:0 7px 18px rgba(120,79,87,.12)}
+.stage-btn:hover{transform:translateY(-2px)}
+.stage-panel{padding:26px 31px;background:rgba(255,255,255,.65);border-radius:22px;display:grid;grid-template-columns:1fr .85fr;gap:30px;align-items:center;min-height:186px}
+.stage-panel h3{font-size:24px;margin:5px 0 12px}.stage-panel p{font-size:13px;color:var(--muted);line-height:2;margin:0}
+.stage-outcome{background:rgba(255,255,255,.83);padding:19px 22px;border-radius:19px;font-size:12px;line-height:1.9;color:var(--ink-2)}
+.stage-outcome b{display:block;color:var(--accent-deep);margin-bottom:6px;font-size:11px;letter-spacing:.07em}
+.questions{display:grid;grid-template-columns:repeat(2,1fr);gap:15px}
+.question{padding:24px 26px;transition:background .2s}
+.question summary{cursor:pointer;list-style:none;display:flex;align-items:flex-start;gap:15px;font-size:17px;font-weight:600;line-height:1.55}
+.question summary::-webkit-details-marker{display:none}
+.question .q-num{color:var(--accent-deep);font-size:11px;font-weight:800;margin-top:6px;flex:none}
+.question .toggle{margin-left:auto;font-size:20px;color:var(--accent-deep);font-weight:350;flex:none;transition:transform .2s}
+.question[open] .toggle{transform:rotate(45deg)}
+.question p{margin:12px 0 0 29px;color:var(--muted);font-size:13px;line-height:1.9}
+.closing{margin:30px auto 90px;padding:55px 60px;text-align:center;background:linear-gradient(145deg,rgba(255,255,255,.9),rgba(255,255,255,.48));position:relative;overflow:hidden}
+.closing::before,.closing::after{position:absolute;font-size:120px;line-height:1;color:var(--accent-light);opacity:.6;pointer-events:none}
+.closing::before{content:"✳";top:-40px;left:-30px}.closing::after{content:"✳";right:-35px;bottom:-45px}
+.closing h2{font-size:clamp(29px,3.5vw,44px);line-height:1.4;letter-spacing:-.03em;margin:15px 0 12px}
+.closing p{font-size:14px;color:var(--muted);line-height:2;max-width:625px;margin:0 auto 23px}
+.closing .pull{font-size:17px;color:var(--accent-deep);font-weight:600}
+.footer{padding:0 0 35px}.footer-inner{display:flex;justify-content:space-between;gap:22px;align-items:center;border-top:1px solid var(--line);padding-top:21px;color:var(--muted);font-size:11px;flex-wrap:wrap}.footer a{text-decoration:none;color:var(--accent-deep)}
+.fade-in{opacity:0;transform:translateY(16px);transition:opacity .65s ease,transform .65s ease}.fade-in.visible{opacity:1;transform:translateY(0)}
+@media (max-width:1030px){.nav{gap:12px}.nav a{font-size:11px}.hero{gap:26px}.float-card{padding:17px}.float-card .symbol{font-size:34px}}
+@media (max-width:850px){.topbar-inner{width:calc(100% - 30px)}.nav{display:none}.hero{grid-template-columns:1fr;min-height:0;padding:72px 0 38px;gap:10px}.hero-art{width:min(430px,92%)}.section{padding:52px 0}.portfolio-grid{grid-template-columns:1fr 1fr}.portfolio-card:last-child{grid-column:1/-1}.portfolio-card:last-child .project-visual{height:210px}.thesis{padding:32px;grid-template-columns:1fr}.insight-grid{grid-template-columns:1fr}.insight-main{min-height:275px}.stage-panel{grid-template-columns:1fr;gap:18px}}
+@media (max-width:580px){.container{width:calc(100% - 30px)}.topbar-inner{min-height:62px}.brand-mark{width:31px;height:31px}.brand-text{font-size:11px}.seasons{gap:6px;padding:5px 7px}.season-dot{width:16px;height:16px}.seasons-label{display:none}.hero{padding:60px 0 35px}.hero h1{font-size:clamp(40px,10vw,57px);margin:17px 0 21px}.hero-desc{font-size:14px}.hero-art{width:min(370px,100%);margin-top:30px}.art-caption{bottom:-4px}.float-card{border-radius:22px;padding:16px}.float-card .label{font-size:15px}.float-card .number{font-size:10px}.float-card .symbol{font-size:31px}.section{padding:44px 0}.section-heading{display:block}.section-heading h2{font-size:29px}.section-heading p{margin-top:10px}.thesis{padding:25px 21px}.thesis blockquote{font-size:25px}.micro-notes,.model-grid,.portfolio-grid,.capabilities,.coop,.questions{grid-template-columns:1fr}.portfolio-card:last-child{grid-column:auto}.project-visual{height:205px}.insight-main{padding:29px 24px}.insight-small{padding:20px}.role{padding:26px}.roadmap{padding:18px}.roadmap-nav{gap:5px}.stage-btn{font-size:11px;border-radius:12px;padding:12px 4px}.stage-btn span{font-size:9px}.stage-panel{padding:20px}.stage-panel h3{font-size:21px}.closing{padding:45px 24px;margin:26px auto 50px}.closing h2{font-size:27px}.btn{padding:12px 17px}.footer-inner{display:block}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}.fade-in{opacity:1;transform:none}}
+@media print{body{background:white!important;color:#403d3a;-webkit-print-color-adjust:exact;print-color-adjust:exact}.topbar,#progress,.page-bg,.noise,.hero-art,.cta-row,.roadmap-nav{display:none!important}.container{width:100%!important}.hero{display:block;padding:35px 0;min-height:0}.hero h1{font-size:44px}.section{padding:22px 0}.paper,.portfolio-card{box-shadow:none!important;backdrop-filter:none!important;break-inside:avoid}.fade-in{opacity:1!important;transform:none!important}.closing{margin:20px 0}.roadmap .stage-panel{display:none}.roadmap .stage-panel:first-of-type{display:grid!important}details:not([open])>p{display:block!important}}
+</style>
+</head>
+<body data-season="spring">
+<div id="progress" aria-hidden="true"></div><div class="page-bg" aria-hidden="true"></div><div class="noise" aria-hidden="true"></div>
+<header class="topbar"><div class="topbar-inner">
+  <a class="brand" href="#top" aria-label="回到首页"><span class="brand-mark">✳</span><span class="brand-text">PLAYFUL IDEAS<small>PRODUCT × TECHNOLOGY</small></span></a>
+  <nav class="nav" aria-label="章节导航"><a href="#view">核心观点</a><a href="#work">项目实践</a><a href="#business">市场与商业</a><a href="#cooperate">合作模式</a><a href="#roadmap">实践路径</a><a href="#discuss">交流问题</a></nav>
+  <div class="seasons" aria-label="切换页面配色"><span class="seasons-label">COLOR</span><button class="season-dot" data-value="spring" title="春 · 雾粉与嫩绿" aria-label="春日配色" aria-pressed="true"></button><button class="season-dot" data-value="summer" title="夏 · 清新森林绿" aria-label="夏日配色" aria-pressed="false"></button><button class="season-dot" data-value="autumn" title="秋 · 杏金与陶土" aria-label="秋日配色" aria-pressed="false"></button><button class="season-dot" data-value="winter" title="冬 · 雪蓝与月光" aria-label="冬日配色" aria-pressed="false"></button></div>
+</div></header>
+<main id="top">
+<section class="hero container">
+  <div class="hero-copy fade-in">
+    <div class="eyebrow">A CONVERSATION ABOUT SMALL GAMES · 2026</div>
+    <h1>让有趣的想法，<br>变成<em>可以玩的产品</em>。</h1>
+    <p class="hero-desc">关于小游戏、AI 辅助开发、产品设计与市场运营的一次开放交流。<br>从一个简单的创意出发，看看我们能创造什么。</p>
+    <div class="cta-row"><a class="btn primary" href="#work">看看做过的项目 <span aria-hidden="true">↗</span></a><a class="btn secondary" href="#view">先聊聊我的想法 <span aria-hidden="true">↓</span></a></div>
+    <div class="hero-meta"><span>独立产品实践</span><span>轻量游戏 / Web</span><span>AI 辅助开发</span><span>开放讨论</span></div>
+  </div>
+  <div class="hero-art fade-in" role="img" aria-label="四张柔和彩色卡片，分别代表创意、开发、验证与运营"><div class="art-wash"></div><div class="orbit"></div>
+    <div class="float-card"><span class="number">01 / IDEA</span><span class="symbol">✦</span><span class="label">有趣的创意</span></div>
+    <div class="float-card"><span class="number">02 / BUILD</span><span class="symbol">⌘</span><span class="label">快速实现</span></div>
+    <div class="float-card"><span class="number">03 / TEST</span><span class="symbol">◌</span><span class="label">真实验证</span></div>
+    <div class="float-card"><span class="number">04 / GROW</span><span class="symbol">↗</span><span class="label">长期运营</span></div>
+    <span class="art-caption">SMALL IDEAS, REAL EXPERIENCES.</span>
+  </div>
+</section>
+<section id="view" class="section container">
+  <div class="section-heading fade-in"><div><span class="section-kicker">01 / A CORE THOUGHT</span><h2>开发变简单之后，<br>真正困难的是什么？</h2></div><p>AI 缩短了从想法到原型的距离，但不会自动带来玩家、口碑与收入。</p></div>
+  <div class="thesis paper fade-in"><div><span class="eyebrow">THE SHIFT</span><blockquote>做出游戏的门槛<br>正在<strong>降低</strong>；<br>获得用户的难度<br>反而可能正在<strong>提高</strong>。</blockquote><p>《羊了个羊》值得研究的，不只是简单的消除玩法，而是它如何把挑战心理、社交话题与传播机制结合起来。成功可以分析，却无法保证复制。</p></div><div class="thesis-steps"><div class="thesis-step"><span class="tag">01</span><div><b>做得出来</b><small>技术可行性 · 能否实现</small></div></div><div class="thesis-step"><span class="tag">02</span><div><b>有人愿意玩</b><small>产品吸引力 · 是否好玩</small></div></div><div class="thesis-step"><span class="tag">03</span><div><b>有人愿意回来</b><small>留存与体验 · 是否持续参与</small></div></div><div class="thesis-step"><span class="tag">04</span><div><b>能持续经营</b><small>分发与变现 · 商业可行性</small></div></div></div></div>
+  <div class="micro-notes"><div class="micro-note paper fade-in"><div class="icon">✳</div><h3>玩法是起点</h3><p>挑战、策略、成就感或情绪价值，至少需要有一个清晰的吸引力。</p></div><div class="micro-note paper fade-in"><div class="icon">☷</div><h3>传播是杠杆</h3><p>用户从哪里来？为什么分享？渠道与内容应该提前纳入产品讨论。</p></div><div class="micro-note paper fade-in"><div class="icon">◎</div><h3>验证是方法</h3><p>不依赖一次押中爆款，而是以可控成本反复测试假设、积累经验。</p></div></div>
+</section>
+<section id="work" class="section container">
+  <div class="section-heading fade-in"><div><span class="section-kicker">02 / THINGS I'VE BUILT</span><h2>从想法到可玩的作品</h2></div><p>这些是已经进行过的个人项目实践，侧重不同的游戏机制与交互体验。</p></div>
+  <div class="portfolio-grid">
+    <article class="portfolio-card fade-in"><div class="project-visual visual-gomoku" aria-hidden="true"><div class="gomoku-board"><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"><i class="piece white"></i></span><span class="cell"><i class="piece"></i></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"><i class="piece"></i></span><span class="cell"><i class="piece white"></i></span><span class="cell"><i class="piece"></i></span><span class="cell"></span><span class="cell"></span><span class="cell"><i class="piece white"></i></span><span class="cell"><i class="piece"></i></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span><span class="cell"></span></div><div class="skill-chip">✦ 技能已就绪</div></div><div class="project-body"><span class="project-index">PROJECT / 01</span><h3>技能五子棋</h3><div class="project-type">策略玩法 · 规则创新</div><p>在熟悉的五子棋机制里加入特殊技能，探索经典玩法如何产生新的决策和互动。</p><div class="chip-row"><span class="chip">游戏规则</span><span class="chip">策略体验</span><span class="chip">交互逻辑</span></div><a class="project-link" href="https://fiveinarow.flyinforest.com" target="_blank" rel="noopener noreferrer" aria-label="打开技能五子棋，在新标签页在线试玩"><span class="project-link-label">在线试玩 · 进入游戏</span><span class="project-link-arrow" aria-hidden="true">↗</span></a><details><summary>这个项目体现了什么？</summary><p>对已有玩法进行再设计：不只是实现棋盘和落子，而是考虑新增规则如何改变玩家的选择和游戏节奏。</p></details></div></article>
+    <article class="portfolio-card fade-in"><div class="project-visual visual-deal" aria-hidden="true"><div class="briefcases"><div class="case">01</div><div class="case">02</div><div class="case">03</div><div class="case">04</div><div class="case special">?</div><div class="case">06</div><div class="case">07</div><div class="case">08</div><div class="case">09</div></div></div><div class="project-body"><span class="project-index">PROJECT / 02</span><h3>一掷千金</h3><div class="project-type">概率博弈 · 休闲决策</div><p>把开箱、银行家报价和 Deal / No Deal 选择改造成可在移动端游玩的网页小游戏。</p><div class="chip-row"><span class="chip">动态报价</span><span class="chip">完整游戏循环</span><span class="chip">移动端适配</span></div><a class="project-link" href="https://deal.flyinforest.com" target="_blank" rel="noopener noreferrer" aria-label="打开一掷千金，在新标签页在线试玩"><span class="project-link-label">在线试玩 · 进入游戏</span><span class="project-link-arrow" aria-hidden="true">↗</span></a><details><summary>这个项目体现了什么？</summary><p>从 26 个箱子的规则，到报价计算、结算、重复模拟和手机端故障排查，都经历了完整的原型制作与多轮迭代。也进一步思考过传播和国内平台发布。</p></details></div></article>
+    <article class="portfolio-card fade-in"><div class="project-visual visual-home" aria-hidden="true"><div class="house-illustration"><div class="house-roof"></div><div class="house-base"><div class="window left"></div><div class="window right"></div><div class="door"><div class="cat"></div></div></div><div class="star">✧</div></div></div><div class="project-body"><span class="project-index">PROJECT / 03</span><h3>多多的家</h3><div class="project-type">治愈系互动 · 虚拟空间</div><p>围绕一只黑猫的生活空间，探索场景、房间、道具互动和小游戏之间的连接。</p><div class="chip-row"><span class="chip">情感体验</span><span class="chip">场景互动</span><span class="chip">氛围设计</span></div><a class="project-link" href="https://gohome.flyinforest.com" target="_blank" rel="noopener noreferrer" aria-label="打开多多的家，在新标签页在线试玩"><span class="project-link-label">在线试玩 · 进入游戏</span><span class="project-link-arrow" aria-hidden="true">↗</span></a><details><summary>这个项目体现了什么？</summary><p>不仅关注能否操作，还关心视觉氛围、用户情绪以及每一个小互动是否自然。属于持续完善中的个人创作项目。</p></details></div></article>
+  </div>
+  <div class="capabilities"><div class="capability paper fade-in"><div class="overline">MY STRENGTH · 01</div><h3>把抽象创意转成产品方案</h3><p>拆解玩法、设计交互流程、建立可玩的核心循环，再决定哪些功能真正需要先做。</p></div><div class="capability paper fade-in"><div class="overline">MY STRENGTH · 02</div><h3>用 IT 基础与 AI 快速试错</h3><p>结合 Web 开发、AI 辅助编程、设备测试与静态部署经验，完成轻量原型并持续优化；复杂商业游戏仍需评估额外技术与团队能力。</p></div></div>
+</section>
+<section id="business" class="section container">
+  <div class="section-heading fade-in"><div><span class="section-kicker">03 / BEYOND THE CODE</span><h2>真正要验证的，<br>不只是「游戏好不好玩」</h2></div><p>技术只是第一步。玩家、分发、留存和收入，决定创意能否成为可持续的业务。</p></div>
+  <div class="insight-grid"><div class="insight-main paper fade-in"><div><div class="eyebrow">LESSON FROM VIRAL GAMES</div><div class="big-mark">“</div><h3>爆款值得研究，<br>但不能被当作商业计划。</h3></div><p>低开发难度不代表低竞争难度。可以学习挑战机制、玩家心理和社交传播，但不能假定重复某种玩法就会重复它的成功。</p></div><div class="insight-side"><div class="insight-small paper fade-in"><span class="serial">A</span><div><h4>第一次接触：获客</h4><p>如何找到目标玩家？能否利用短视频、社群、内容账号、渠道合作取得第一批流量？</p></div></div><div class="insight-small paper fade-in"><span class="serial">B</span><div><h4>进入之后：留存</h4><p>玩家能否快速理解游戏？是否愿意再玩一次？失败、奖励和难度是否形成合理节奏？</p></div></div><div class="insight-small paper fade-in"><span class="serial">C</span><div><h4>长期经营：效率</h4><p>获取用户的成本，与用户可能产生的广告或内购收入，是否有机会形成可持续关系？</p></div></div></div></div>
+  <div class="section-heading fade-in" style="margin-top:53px"><div><span class="section-kicker">REVENUE OPTIONS</span><h2 style="font-size:clamp(25px,2.6vw,34px)">商业化可以有不同路径</h2></div></div>
+  <div class="model-grid"><div class="model paper fade-in"><div class="model-head"><span class="model-code">IAA</span><span class="model-icon">◉</span></div><h3>广告变现</h3><p>激励视频等形式，更适合拥有一定使用量和重复游玩行为的轻量休闲产品。</p></div><div class="model paper fade-in"><div class="model-head"><span class="model-code">IAP</span><span class="model-icon">✧</span></div><h3>游戏内购</h3><p>道具、装扮、成长内容等形式，适合具有长期体验与付费价值的游戏。</p></div><div class="model paper fade-in"><div class="model-head"><span class="model-code">HYBRID</span><span class="model-icon">∞</span></div><h3>混合模式</h3><p>广告与内购相结合，但要特别关注付费设计是否破坏玩家体验。</p></div></div>
+  <p class="disclaimer">注：正式上线微信小游戏，还需根据实际情况评估平台适配、开发者资质、审核、合规要求以及广告或支付接入。Web 原型并不自动等于可上线的小程序游戏。</p>
+</section>
+<section id="cooperate" class="section container">
+  <div class="section-heading fade-in"><div><span class="section-kicker">04 / HOW WE MIGHT WORK TOGETHER</span><h2>不只是「你提想法，我写代码」</h2></div><p>更有潜力的合作，是产品技术与市场运营形成互补，共同决定产品方向。</p></div>
+  <div class="coop"><article class="role paper fade-in"><div class="role-label">PRODUCT & TECHNOLOGY</div><h3>产品 × 技术</h3><p class="sub">可以重点承担的方向</p><ul><li>把创意拆解为玩法、流程和原型</li><li>用 Web / AI 工具快速进行开发验证</li><li>处理交互体验、适配、测试和迭代</li><li>结合用户反馈与数据优化产品</li></ul></article><article class="role paper fade-in"><div class="role-label">MARKETING & OPERATIONS</div><h3>市场 × 运营</h3><p class="sub">期待合作方能够发挥的优势</p><ul><li>洞察玩家需求，明确目标人群</li><li>规划内容推广、渠道与社群合作</li><li>获得真实用户并持续收集反馈</li><li>探索商业变现与日常运营</li></ul></article></div>
+  <div class="coop-middle fade-in"><span class="line"></span><span>共同负责：产品方向 · 优先级 · 投入决策 · 商业判断</span><span class="line"></span></div>
+</section>
+<section id="roadmap" class="section container">
+  <div class="section-heading fade-in"><div><span class="section-kicker">05 / START SMALL, LEARN FAST</span><h2>从一次小实验开始</h2></div><p>不预设成功，也不一开始就投入过多。点击不同阶段，看看各阶段最重要的事。</p></div>
+  <div class="roadmap paper fade-in"><div class="roadmap-nav" role="tablist" aria-label="产品验证五个阶段"><button class="stage-btn" role="tab" aria-selected="true" aria-controls="stage-panel" data-stage="0"><span>STEP 01</span>选择方向</button><button class="stage-btn" role="tab" aria-selected="false" aria-controls="stage-panel" data-stage="1"><span>STEP 02</span>可玩原型</button><button class="stage-btn" role="tab" aria-selected="false" aria-controls="stage-panel" data-stage="2"><span>STEP 03</span>真实测试</button><button class="stage-btn" role="tab" aria-selected="false" aria-controls="stage-panel" data-stage="3"><span>STEP 04</span>验证收入</button><button class="stage-btn" role="tab" aria-selected="false" aria-controls="stage-panel" data-stage="4"><span>STEP 05</span>复盘迭代</button></div><div class="stage-panel" id="stage-panel" role="tabpanel" aria-live="polite"><div><div class="eyebrow" id="stage-kicker">STEP 01 / DEFINE</div><h3 id="stage-title">确定一个足够清晰的核心玩法</h3><p id="stage-desc">先明确目标玩家、最吸引人的游戏机制，以及可能从哪里获得第一批用户。尽量避免一开始就叠加大量功能。</p></div><div class="stage-outcome"><b>这一阶段的成果</b><span id="stage-outcome">一个可描述清楚的游戏想法、目标人群与初步验证计划。</span></div></div></div>
+</section>
+<section id="discuss" class="section container">
+  <div class="section-heading fade-in"><div><span class="section-kicker">06 / A FEW GOOD QUESTIONS</span><h2>接下来，我们可以聊聊这些</h2></div><p>没有标准答案，更希望彼此了解想法、能力、资源与预期。</p></div>
+  <div class="questions"><details class="question paper fade-in"><summary><span class="q-num">01</span>最想做哪一种小游戏？<span class="toggle">＋</span></summary><p>偏社交传播的休闲游戏、概率与策略玩法、养成经营，还是情绪治愈类互动？目前有没有具体参考产品？</p></details><details class="question paper fade-in"><summary><span class="q-num">02</span>更想做作品，还是长期业务？<span class="toggle">＋</span></summary><p>是想把一个喜欢的创意实现出来，还是希望持续制作、运营并尝试获得收入？两者的投入方式不同。</p></details><details class="question paper fade-in"><summary><span class="q-num">03</span>有哪些可以尝试的分发渠道？<span class="toggle">＋</span></summary><p>不必一开始就有成熟渠道，但希望了解已有内容运营、社群、推广或合作资源，以及获取首批玩家的具体思路。</p></details><details class="question paper fade-in"><summary><span class="q-num">04</span>我们各自能够贡献什么？<span class="toggle">＋</span></summary><p>时间、技术、策划、市场、预算、执行力各自如何分担？如果要深入合作，也需要逐步明确权益和责任。</p></details></div>
+</section>
+<section class="closing paper container fade-in"><div class="eyebrow">FROM AN IDEA TO SOMETHING REAL</div><h2>不一定要做出下一个爆款。<br>先做出<span style="color:var(--accent-deep)">值得被试玩的第一款</span>。</h2><p>找到一个清晰的玩法，做一个可体验的版本，交给真实用户检验。让产品开发与市场运营形成循环，让每次尝试都留下可复用的能力。</p><div class="pull">技术让创意更容易实现，产品让创意有价值，运营决定它能走多远。</div><div class="cta-row" style="justify-content:center;margin-top:29px"><a class="btn primary" href="#top">回到开头 ↑</a><button class="btn secondary" id="printButton" type="button">打印 / 另存为 PDF ↗</button></div></section>
+</main>
+<footer class="footer container"><div class="footer-inner"><span>PLAYFUL IDEAS · 一份开放的产品交流提案</span><span>Made with curiosity, thoughtfully built · <a href="#top">Back to top ↑</a></span></div></footer>
+<script>
+(function(){
+'use strict';
+const doc=document, body=doc.body;
+const stages=[
+ {k:'STEP 01 / DEFINE',t:'确定一个足够清晰的核心玩法',d:'先明确目标玩家、最吸引人的游戏机制，以及可能从哪里获得第一批用户。尽量避免一开始就叠加大量功能。',o:'一个可描述清楚的游戏想法、目标人群与初步验证计划。'},
+ {k:'STEP 02 / PROTOTYPE',t:'用最低成本做出可玩的版本',d:'利用现有 Web 技术和 AI 辅助开发，把注意力放在玩家最重要的操作与反馈上。优先形成完整的游戏循环。',o:'一个能在手机或电脑上试玩的最小可行版本（MVP）。'},
+ {k:'STEP 03 / TEST',t:'让真实用户告诉我们答案',d:'安排第一批玩家测试，观察进入、完成、重复游玩、主动分享等行为。同时收集他们真正的困惑和建议。',o:'真实的用户反馈、基础行为数据，以及继续优化或停止的判断。'},
+ {k:'STEP 04 / MONETIZE',t:'验证产品能否健康地经营',d:'根据游戏类型和用户行为，评估广告、内购或组合方式。重点关注玩家体验、获客成本与收入之间的关系。',o:'初步的商业化方案，以及对可持续性的现实判断。'},
+ {k:'STEP 05 / LEARN',t:'复盘，再决定下一步',d:'如果结果好，逐步投入更多资源；如果不理想，识别失败原因、调整方向。无论哪种情况，都把经验沉淀为下一次的优势。',o:'一套逐渐可复用的研发、分发、测试与协作方法。'}
+];
+const tabs=Array.from(doc.querySelectorAll('.stage-btn'));
+function showStage(i){const item=stages[i];if(!item)return;doc.getElementById('stage-kicker').textContent=item.k;doc.getElementById('stage-title').textContent=item.t;doc.getElementById('stage-desc').textContent=item.d;doc.getElementById('stage-outcome').textContent=item.o;tabs.forEach((tab,index)=>{tab.setAttribute('aria-selected',index===i?'true':'false');tab.tabIndex=index===i?0:-1})}
+tabs.forEach((tab,i)=>{tab.addEventListener('click',()=>showStage(i));tab.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();let n=(i+(e.key==='ArrowRight'?1:stages.length-1))%stages.length;showStage(n);tabs[n].focus()}})});
+const themeButtons=doc.querySelectorAll('.season-dot');themeButtons.forEach(button=>button.addEventListener('click',()=>{body.dataset.season=button.dataset.value;themeButtons.forEach(other=>other.setAttribute('aria-pressed',other===button?'true':'false'));const colors={spring:'#f9f3f7',summer:'#ebf7e8',autumn:'#f8f1e8',winter:'#eff5fc'};doc.querySelector('meta[name="theme-color"]').setAttribute('content',colors[button.dataset.value]||'#f9f3f7')}));
+const reveals=doc.querySelectorAll('.fade-in');if('IntersectionObserver' in window&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches){const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target)}})},{threshold:.07,rootMargin:'0px 0px -18px 0px'});reveals.forEach(node=>observer.observe(node))}else reveals.forEach(node=>node.classList.add('visible'));
+const progress=doc.getElementById('progress');let waiting=false;function updateProgress(){waiting=false;const max=doc.documentElement.scrollHeight-innerHeight;progress.style.width=(max>0?Math.min(100,Math.max(0,scrollY/max*100)):0)+'%'}window.addEventListener('scroll',()=>{if(!waiting){waiting=true;requestAnimationFrame(updateProgress)}},{passive:true});window.addEventListener('resize',updateProgress);updateProgress();
+doc.getElementById('printButton').addEventListener('click',()=>window.print());
+})();
+</script>
+</body>
+</html>
